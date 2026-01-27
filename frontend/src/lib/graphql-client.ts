@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 
-const endpoint = '/graphql';
+const endpoint = import.meta.env.VITE_API_URL || '/graphql';
 
 export const createGraphQLClient = (token?: string) => {
   return new GraphQLClient(endpoint, {

@@ -6,31 +6,42 @@ dotenv.config();
 async function testConnection() {
   console.log('🔍 Testing PostgreSQL connection...\n');
   
-  const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '5432'),
-    database: 'postgres', // Connect to default postgres database first
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  });
+  const isConnectionString = process.env.DB_HOST?.startsWith('postgresql://') || process.env.DB_HOST?.startsWith('postgres://');
+  
+  const pool = new Pool(
+    isConnectionString 
+      ? { 
+          connectionString: process.env.DB_HOST,
+          ssl: { rejectUnauthorized: false }
+        }
+      : {
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT || '5432'),
+          database: 'postgres',
+          user: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+          ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
+        }
+  );
 
   try {
     // Test connection
     const client = await pool.connect();
     console.log('✅ PostgreSQL connection successful!');
     
-    // Check if tms_db exists
+    // Check if configured database exists
+    const dbName = process.env.DB_NAME || 'railway';
     const result = await client.query(
-      "SELECT 1 FROM pg_database WHERE datname = 'tms_db'"
+      "SELECT 1 FROM pg_database WHERE datname = $1",
+      [dbName]
     );
     
     if (result.rows.length > 0) {
-      console.log('✅ Database "tms_db" exists');
+      console.log(`✅ Database "${dbName}" exists`);
     } else {
-      console.log('❌ Database "tms_db" NOT found');
+      console.log(`❌ Database "${dbName}" NOT found`);
       console.log('\n📝 To create the database, run:');
-      console.log('   psql -U postgres -c "CREATE DATABASE tms_db;"');
-      console.log('   OR use pgAdmin to create a database named "tms_db"');
+      console.log(`   psql -U postgres -c "CREATE DATABASE ${dbName};"`);
     }
     
     client.release();

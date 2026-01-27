@@ -4,11 +4,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
+  connectionString: process.env.DB_HOST?.includes('://') ? process.env.DB_HOST : undefined,
+  host: process.env.DB_HOST?.includes('://') ? undefined : process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  ssl: process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true' || process.env.DB_HOST?.includes('rlwy.net')
+    ? { rejectUnauthorized: false } 
+    : false,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
