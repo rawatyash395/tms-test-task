@@ -11,7 +11,7 @@ export const createShipmentLoader = () => {
     );
 
     const shipmentsMap = new Map<number, Shipment>();
-    result.rows.forEach((row) => {
+    result.rows.forEach((row: any) => {
       shipmentsMap.set(row.id, row as Shipment);
     });
 
@@ -28,7 +28,7 @@ export const createUserLoader = () => {
     );
 
     const usersMap = new Map<number, User>();
-    result.rows.forEach((row) => {
+    result.rows.forEach((row: any) => {
       usersMap.set(row.id, row as User);
     });
 
