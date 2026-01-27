@@ -7,6 +7,7 @@ import { typeDefs } from './schema/typeDefs';
 import { resolvers } from './resolvers';
 import { verifyToken } from './auth';
 import { createShipmentLoader, createUserLoader } from './loaders';
+import { Context } from './types';
 
 dotenv.config();
 
@@ -38,9 +39,16 @@ async function startServer() {
       context: async ({ req }) => {
         const token = req.headers.authorization?.replace('Bearer ', '') || '';
         
-        let user = null;
+        let user: Context['user'] = undefined;
         if (token) {
-          user = verifyToken(token);
+          const verified = verifyToken(token);
+          if (verified) {
+            user = {
+              id: verified.id,
+              email: verified.email,
+              role: verified.role as 'admin' | 'employee'
+            };
+          }
         }
 
         return {
