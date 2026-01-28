@@ -6,7 +6,7 @@ import { User } from '../types';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
-export const generateToken = (user: { id: number; email: string; role: string }) => {
+export const generateToken = (user: { id: number; email: string; role: 'admin' | 'employee' }) => {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     JWT_SECRET,
@@ -16,7 +16,7 @@ export const generateToken = (user: { id: number; email: string; role: string })
 
 export const verifyToken = (token: string) => {
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: number; email: string; role: string };
+    return jwt.verify(token, JWT_SECRET) as { id: number; email: string; role: 'admin' | 'employee' };
   } catch (error) {
     return null;
   }

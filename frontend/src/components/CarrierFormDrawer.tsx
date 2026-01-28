@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Save, Truck, Phone, Mail } from "lucide-react";
+import { CustomSelect } from "./CustomSelect";
 
 interface CarrierFormDrawerProps {
   isOpen: boolean;
@@ -8,14 +9,25 @@ interface CarrierFormDrawerProps {
   onSubmit: (data: any) => void;
 }
 
+const INITIAL_STATE = {
+  name: "",
+  phone: "",
+  contact: "",
+  fleetSize: "",
+  region: "North America",
+};
+
 export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
   isOpen,
   onClose,
   onSubmit,
 }) => {
+  const [formData, setFormData] = useState(INITIAL_STATE);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      setFormData(INITIAL_STATE);
     } else {
       document.body.style.overflow = "unset";
     }
@@ -24,13 +36,17 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
     };
   }, [isOpen]);
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const data = Object.fromEntries(formData.entries());
-
     onSubmit({
-      ...data,
+      ...formData,
       id: Math.random().toString(36).substr(2, 9),
       rating: parseFloat((Math.random() * (5 - 3.5) + 3.5).toFixed(1)),
       activeShipments: 0,
@@ -56,7 +72,7 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-y-0 right-0 w-full max-w-[500px] bg-white z-[200] shadow-2xl flex flex-col"
           >
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-900/20">
                   <Truck className="w-6 h-6" />
@@ -81,7 +97,7 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
             <form
               id="carrier-form"
               onSubmit={handleSubmit}
-              className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar"
+              className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
             >
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
@@ -98,6 +114,8 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
                   <input
                     name="name"
                     required
+                    value={formData.name}
+                    onChange={handleChange}
                     className="input w-full"
                     placeholder="e.g. Global Logistics Corp"
                   />
@@ -113,6 +131,8 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
                       name="phone"
                       type="tel"
                       required
+                      value={formData.phone}
+                      onChange={handleChange}
                       className="input w-full"
                       placeholder="+1 (555) 000-0000"
                     />
@@ -126,6 +146,8 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
                       name="contact"
                       type="email"
                       required
+                      value={formData.contact}
+                      onChange={handleChange}
                       className="input w-full"
                       placeholder="ops@carrier.com"
                     />
@@ -140,40 +162,41 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
                     name="fleetSize"
                     type="number"
                     min="1"
+                    value={formData.fleetSize}
+                    onChange={handleChange}
                     className="input w-full"
                     placeholder="Approximate units"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
-                    Operational Region
-                  </label>
-                  <select
-                    name="region"
-                    className="input w-full appearance-none"
-                  >
-                    <option value="North America">NORTH AMERICA</option>
-                    <option value="Europe">EUROPE</option>
-                    <option value="Asia Pacific">ASIA PACIFIC</option>
-                    <option value="Global">GLOBAL NETWORK</option>
-                  </select>
-                </div>
+                <CustomSelect
+                  label="Operational Region"
+                  value={formData.region}
+                  onChange={(val) =>
+                    setFormData((prev) => ({ ...prev, region: val }))
+                  }
+                  options={[
+                    { value: "North America", label: "NORTH AMERICA" },
+                    { value: "Europe", label: "EUROPE" },
+                    { value: "Asia Pacific", label: "ASIA PACIFIC" },
+                    { value: "Global", label: "GLOBAL NETWORK" },
+                  ]}
+                />
               </div>
             </form>
 
-            <div className="p-8 border-t border-slate-50 bg-slate-50/50 flex gap-4 mt-auto">
+            <div className="p-6 border-t border-slate-50 bg-slate-50/50 flex gap-4 mt-auto">
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-secondary flex-1"
+                className="btn-secondary flex-1 max-h-[42px] p-2"
               >
                 Cancel
               </button>
               <button
                 form="carrier-form"
                 type="submit"
-                className="btn-primary flex-[2]"
+                className="btn-primary flex-[2] max-h-[42px] p-2"
               >
                 <Save className="w-5 h-5" />
                 Register Partner

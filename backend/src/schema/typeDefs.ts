@@ -68,6 +68,14 @@ export const typeDefs = gql`
     totalPages: Int!
   }
 
+  type SystemStats {
+    totalShipments: Int!
+    pendingShipments: Int!
+    inTransitShipments: Int!
+    deliveredShipments: Int!
+    totalUsers: Int!
+  }
+
   input ShipmentFilterInput {
     status: String
     carrier_name: String
@@ -136,6 +144,10 @@ export const typeDefs = gql`
     ): ShipmentsResponse!
     
     shipment(id: ID!): Shipment!
+    
+    users: [User!]!
+    
+    systemStats: SystemStats!
   }
 
   type Mutation {
@@ -143,5 +155,6 @@ export const typeDefs = gql`
     
     createShipment(input: CreateShipmentInput!): Shipment!
     updateShipment(id: ID!, input: UpdateShipmentInput!): Shipment!
+    deleteShipment(id: ID!): Boolean!
   }
 `;

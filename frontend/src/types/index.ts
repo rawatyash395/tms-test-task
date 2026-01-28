@@ -27,8 +27,6 @@ export interface Shipment {
   currency: string;
   priority: 'low' | 'normal' | 'high' | 'urgent';
   notes?: string;
-  is_flagged: boolean;
-  flagged_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -57,3 +55,11 @@ export interface SortConfig {
 }
 
 export type ViewMode = 'grid' | 'tile';
+
+export interface SystemStats {
+  totalShipments: number;
+  pendingShipments: number;
+  inTransitShipments: number;
+  deliveredShipments: number;
+  totalUsers: number;
+}

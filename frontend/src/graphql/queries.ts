@@ -55,8 +55,6 @@ export const SHIPMENTS_QUERY = gql`
         currency
         priority
         notes
-        is_flagged
-        flagged_reason
         created_at
         updated_at
       }
@@ -91,8 +89,6 @@ export const SHIPMENT_QUERY = gql`
       currency
       priority
       notes
-      is_flagged
-      flagged_reason
       created_at
       updated_at
     }

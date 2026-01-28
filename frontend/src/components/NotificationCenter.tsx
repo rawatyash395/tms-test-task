@@ -197,7 +197,7 @@ export const NotificationCenter: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="p-12 text-center">
+                <div className="p-8 text-center">
                   <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Bell className="w-6 h-6 text-slate-300" />
                   </div>

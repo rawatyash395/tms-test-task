@@ -1,15 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Shipment } from "../types";
-import {
-  Calendar,
-  Truck,
-  Package,
-  MoreVertical,
-  Edit2,
-  Trash2,
-  ArrowRight,
-} from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Calendar, Truck, Package, Edit2, Trash2 } from "lucide-react";
 
 interface ShipmentTileViewProps {
   shipments: Shipment[];
@@ -26,24 +17,9 @@ const ShipmentTile: React.FC<{
   onEdit?: (shipment: Shipment) => void;
   onDelete?: (shipment: Shipment) => void;
 }> = ({ shipment, onShipmentClick, isAdmin, onEdit, onDelete }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    if (isMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
-
   return (
     <div
-      className="main-card p-8 group hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer relative"
+      className="main-card p-6 group hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer relative"
       onClick={() => onShipmentClick(shipment)}
     >
       {/* Decorative Gradient Overlay - Moved inside a clipped container */}
@@ -56,69 +32,30 @@ const ShipmentTile: React.FC<{
           {shipment.status.replace("_", " ")}
         </div>
 
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
-            }}
-            className={`p-2 rounded-xl transition-all ${isMenuOpen ? "bg-slate-900 text-white shadow-lg" : "text-slate-400 hover:text-slate-900 hover:bg-slate-100"}`}
-          >
-            <MoreVertical className="w-5 h-5" />
-          </button>
-
-          <AnimatePresence>
-            {isMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                style={{ originX: 1, originY: 0 }}
-                className="absolute right-0 mt-3 w-56 bg-white border border-slate-200 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[100] overflow-hidden"
-              >
-                <div className="p-2.5 space-y-1">
-                  {isAdmin && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsMenuOpen(false);
-                          // Delay slightly to allow menu close animation before parent state change
-                          onEdit?.(shipment);
-                        }}
-                        className="w-full flex items-center gap-3.5 px-4 py-3 text-[11px] font-bold text-blue-600 hover:bg-blue-50 rounded-xl transition-colors group/item"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover/item:bg-white transition-colors">
-                          <Edit2 className="w-4 h-4" />
-                        </div>
-                        <span className="flex-1 text-left uppercase tracking-wider">
-                          Modify Record
-                        </span>
-                        <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover/item:opacity-100 transition-all -translate-x-2 group-hover/item:translate-x-0" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsMenuOpen(false);
-                          setTimeout(() => onDelete?.(shipment), 50);
-                        }}
-                        className="w-full flex items-center gap-3.5 px-4 py-3 text-[11px] font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors group/item"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center group-hover/item:bg-white transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </div>
-                        <span className="flex-1 text-left uppercase tracking-wider">
-                          Delete Asset
-                        </span>
-                        <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover/item:opacity-100 transition-all -translate-x-2 group-hover/item:translate-x-0" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {isAdmin && (
+          <div className="flex items-center gap-2 relative z-30 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.(shipment);
+              }}
+              className="p-2.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95 border border-blue-100/50"
+              title="Edit Record"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.(shipment);
+              }}
+              className="p-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm active:scale-95 border border-rose-100/50"
+              title="Delete Asset"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="space-y-6 relative z-10">
@@ -225,7 +162,7 @@ export const ShipmentTileView: React.FC<ShipmentTileViewProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {shipments.map((shipment) => (
         <ShipmentTile
           key={shipment.id}

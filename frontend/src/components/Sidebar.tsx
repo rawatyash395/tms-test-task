@@ -88,7 +88,7 @@ export const Sidebar: React.FC<HamburgerMenuProps> = ({
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-8 flex items-center gap-4">
+          <div className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-900/20">
               <Hexagon className="w-7 h-7 text-white" fill="currentColor" />
             </div>

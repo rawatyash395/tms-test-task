@@ -31,6 +31,8 @@ export interface Shipment {
   created_by?: number;
   created_at: Date;
   updated_at: Date;
+  is_flagged: boolean;
+  flagged_reason?: string;
 }
 
 export interface Context {
@@ -38,6 +40,8 @@ export interface Context {
     id: number;
     email: string;
     role: 'admin' | 'employee';
+    is_flagged: boolean;
+    flagged_reason?: string;
   };
   loaders: {
     shipment: import('dataloader')<number, Shipment>;

@@ -15,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 async function startServer() {
-  const server = new ApolloServer({
+  const server = new ApolloServer<Context>({
     typeDefs,
     resolvers,
     formatError: (error) => {
@@ -36,18 +36,14 @@ async function startServer() {
   app.use(
     '/graphql',
     expressMiddleware(server, {
-      context: async ({ req }) => {
+      context: async ({ req }): Promise<Context> => {
         const token = req.headers.authorization?.replace('Bearer ', '') || '';
         
         let user: Context['user'] = undefined;
         if (token) {
-          const verified = verifyToken(token);
-          if (verified) {
-            user = {
-              id: verified.id,
-              email: verified.email,
-              role: verified.role as 'admin' | 'employee'
-            };
+          const decoded = verifyToken(token);
+          if (decoded) {
+            user = decoded as Context['user'];
           }
         }
 

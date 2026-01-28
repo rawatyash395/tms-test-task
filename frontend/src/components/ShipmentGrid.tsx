@@ -1,13 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { Shipment } from "../types";
-import {
-  MoreVertical,
-  Calendar,
-  Edit2,
-  Trash2,
-  ArrowRight,
-} from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Calendar, Edit2, Trash2 } from "lucide-react";
 
 interface ShipmentGridProps {
   shipments: Shipment[];
@@ -24,21 +17,6 @@ const ShipmentRow: React.FC<{
   onEdit?: (shipment: Shipment) => void;
   onDelete?: (shipment: Shipment) => void;
 }> = ({ shipment, onShipmentClick, isAdmin, onEdit, onDelete }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    if (isMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
-
   return (
     <tr
       className="group hover:bg-slate-50/50 transition-all cursor-pointer"
@@ -46,9 +24,7 @@ const ShipmentRow: React.FC<{
     >
       <td className="px-8 py-6">
         <span className="text-sm font-bold text-slate-900 tracking-tight font-mono">
-          #
-          {shipment.tracking_number ||
-            shipment.id.substring(0, 8).toUpperCase()}
+          #{shipment.tracking_number || shipment.id}
         </span>
       </td>
       <td className="px-8 py-6">
@@ -94,68 +70,32 @@ const ShipmentRow: React.FC<{
             : new Date(shipment.pickup_date).toLocaleDateString()}
         </div>
       </td>
-      <td className="px-8 py-6 text-right relative">
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
-            }}
-            className={`p-2 rounded-xl transition-all ${isMenuOpen ? "bg-slate-900 text-white shadow-lg" : "text-slate-400 hover:text-slate-900 hover:bg-slate-100"}`}
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-
-          <AnimatePresence>
-            {isMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                style={{ originX: 1, originY: 0 }}
-                className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[100] overflow-hidden text-left"
+      <td className="px-8 py-6 text-right">
+        <div className="flex items-center justify-end gap-2 transition-opacity">
+          {isAdmin && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(shipment);
+                }}
+                className="p-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95"
+                title="Edit Record"
               >
-                <div className="p-2.5 space-y-1">
-                  {isAdmin && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsMenuOpen(false);
-                          onEdit?.(shipment);
-                        }}
-                        className="w-full flex items-center gap-3.5 px-4 py-3 text-[11px] font-bold text-blue-600 hover:bg-blue-50 rounded-xl transition-colors group/item"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center group-hover/item:bg-white transition-colors">
-                          <Edit2 className="w-4 h-4" />
-                        </div>
-                        <span className="flex-1 uppercase tracking-wider">
-                          Edit Record
-                        </span>
-                        <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover/item:opacity-100 transition-all -translate-x-2 group-hover/item:translate-x-0" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsMenuOpen(false);
-                          onDelete?.(shipment);
-                        }}
-                        className="w-full flex items-center gap-3.5 px-4 py-3 text-[11px] font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors group/item"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center group-hover/item:bg-white transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </div>
-                        <span className="flex-1 uppercase tracking-wider">
-                          Delete Asset
-                        </span>
-                        <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover/item:opacity-100 transition-all -translate-x-2 group-hover/item:translate-x-0" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(shipment);
+                }}
+                className="p-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm active:scale-95"
+                title="Delete Asset"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       </td>
     </tr>
@@ -172,16 +112,24 @@ export const ShipmentGrid: React.FC<ShipmentGridProps> = ({
   return (
     <div className="overflow-x-auto min-h-[400px]">
       <table className="w-full text-left border-separate border-spacing-0">
-        <thead>
+        <thead className="sticky top-0 z-20">
           <tr className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-            <th className="px-8 py-5 border-b border-slate-100">Registry ID</th>
-            <th className="px-8 py-5 border-b border-slate-100">Stakeholder</th>
-            <th className="px-8 py-5 border-b border-slate-100">Lifecycle</th>
-            <th className="px-8 py-5 border-b border-slate-100">
+            <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+              Registry ID
+            </th>
+            <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+              Stakeholder
+            </th>
+            <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+              Lifecycle
+            </th>
+            <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
               Logistics Route
             </th>
-            <th className="px-8 py-5 border-b border-slate-100">Scheduled</th>
-            <th className="px-8 py-5 border-b border-slate-100 text-right">
+            <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+              Scheduled
+            </th>
+            <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10 text-right">
               Actions
             </th>
           </tr>
