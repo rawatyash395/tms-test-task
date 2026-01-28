@@ -34,7 +34,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative bg-white rounded-[3rem] p-12 max-w-lg w-full shadow-2xl border border-slate-100"
+          className="relative bg-white rounded-[3rem] p-8 max-w-lg w-full shadow-2xl border border-slate-100"
         >
           <div className="w-20 h-20 rounded-[1.5rem] bg-rose-50 flex items-center justify-center text-rose-500 mb-8 mx-auto shadow-sm shadow-rose-100">
             <Trash2 className="w-10 h-10" />

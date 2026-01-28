@@ -12,10 +12,10 @@ export const shipmentResolvers = {
         limit = 10,
         sort,
       }: {
-        filter?: ShipmentFilterInput;
+        filter?: any;
         page?: number;
         limit?: number;
-        sort?: SortInput;
+        sort?: any;
       },
       context: Context
     ) => {
@@ -113,19 +113,43 @@ export const shipmentResolvers = {
 
       return result.rows[0];
     },
+
+    systemStats: async (_: any, __: any, context: Context) => {
+      requireAuth(context);
+
+      const shipmentsCount = await query('SELECT COUNT(*) FROM shipments');
+      const pendingCount = await query("SELECT COUNT(*) FROM shipments WHERE status = 'pending'");
+      const inTransitCount = await query("SELECT COUNT(*) FROM shipments WHERE status = 'in_transit'");
+      const deliveredCount = await query("SELECT COUNT(*) FROM shipments WHERE status = 'delivered'");
+      const usersCount = await query('SELECT COUNT(*) FROM users');
+
+      return {
+        totalShipments: parseInt(shipmentsCount.rows[0].count),
+        pendingShipments: parseInt(pendingCount.rows[0].count),
+        inTransitShipments: parseInt(inTransitCount.rows[0].count),
+        deliveredShipments: parseInt(deliveredCount.rows[0].count),
+        totalUsers: parseInt(usersCount.rows[0].count),
+      };
+    },
   },
 
   Shipment: {
-    // Performance Optimization: Use DataLoader to batch user lookups and avoid N+1 query problem
     created_by: async (parent: any, _: any, { loaders }: Context) => {
       if (!parent.created_by) return null;
       return loaders.user.load(parent.created_by);
     },
+    pickup_date: (parent: any) => parent.pickup_date instanceof Date ? parent.pickup_date.toISOString() : parent.pickup_date,
+    delivery_date: (parent: any) => parent.delivery_date instanceof Date ? parent.delivery_date.toISOString() : parent.delivery_date,
+    estimated_delivery: (parent: any) => parent.estimated_delivery instanceof Date ? parent.estimated_delivery.toISOString() : parent.estimated_delivery,
+    created_at: (parent: any) => parent.created_at instanceof Date ? parent.created_at.toISOString() : parent.created_at,
+    updated_at: (parent: any) => parent.updated_at instanceof Date ? parent.updated_at.toISOString() : parent.updated_at,
   },
 
   Mutation: {
     createShipment: async (_: any, { input }: { input: any }, context: Context) => {
       const user = requireAdmin(context);
+
+      const tracking_number = input.tracking_number || `TRK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
       const result = await query(
         `INSERT INTO shipments (
@@ -149,7 +173,7 @@ export const shipmentResolvers = {
           input.pickup_date,
           input.delivery_location,
           input.estimated_delivery,
-          input.tracking_number,
+          tracking_number,
           input.status || 'pending',
           input.weight_kg,
           input.dimensions,
@@ -200,6 +224,14 @@ export const shipmentResolvers = {
       }
 
       return result.rows[0];
+    },
+
+    deleteShipment: async (_: any, { id }: { id: number }, context: Context) => {
+      requireAdmin(context);
+
+      const result = await query('DELETE FROM shipments WHERE id = $1', [id]);
+
+      return (result.rowCount ?? 0) > 0;
     },
   },
 };

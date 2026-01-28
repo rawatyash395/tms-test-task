@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   FileText,
   Download,
-  Filter,
   RefreshCw,
   Search,
   CheckCircle2,
@@ -12,7 +11,6 @@ import {
 
 export const ReportsView: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -27,6 +25,17 @@ export const ReportsView: React.FC = () => {
         }),
       );
     }, 2000);
+  };
+
+  const handleDownload = (reportName: string) => {
+    window.dispatchEvent(
+      new CustomEvent("app:toast", {
+        detail: {
+          message: `PROTOCOL "${reportName}" DOWNLOAD INITIATED`,
+          type: "success",
+        },
+      }),
+    );
   };
 
   const recentReports = [
@@ -54,158 +63,110 @@ export const ReportsView: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-10 animate-fade-in pb-12">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 leading-none">
-            Reporting Terminal
-          </h2>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
-            Intelligence Extraction Console
-          </p>
+    <div className="space-y-10 animate-fade-in">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="main-card p-5 group flex items-start justify-between">
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Pipeline Health
+            </p>
+            <h3 className="text-3xl font-bold text-slate-900 tracking-tighter">
+              99.8%
+            </h3>
+            <p className="text-xs font-bold text-primary-600 mt-2 flex items-center gap-1 uppercase">
+              Accuracy{" "}
+              <span className="text-slate-400 font-medium lowercase">
+                threshold
+              </span>
+            </p>
+          </div>
+          <div className="p-3 bg-slate-100 rounded-xl text-slate-700 group-hover:bg-primary-50 group-hover:text-primary-600 transition-all">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
         </div>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all border ${
-              showFilters
-                ? "bg-slate-900 text-white border-slate-900 shadow-xl"
-                : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
-            }`}
-          >
-            <Filter className="w-4 h-4" />
-            {showFilters ? "Hide Parameters" : "Filter Streams"}
-          </button>
+
+        <div className="main-card p-5 group flex items-start justify-between">
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Total Extracts
+            </p>
+            <h3 className="text-3xl font-bold text-slate-900 tracking-tighter">
+              1,240
+            </h3>
+            <p className="text-xs font-bold text-blue-600 mt-2 flex items-center gap-1 uppercase">
+              Fiscal{" "}
+              <span className="text-slate-400 font-medium lowercase">
+                cycle 2026
+              </span>
+            </p>
+          </div>
+          <div className="p-3 bg-slate-100 rounded-xl text-slate-700 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+            <ArrowUpRight className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="main-card p-5 group flex items-start justify-between">
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              Processing KPI
+            </p>
+            <h3 className="text-3xl font-bold text-slate-900 tracking-tighter">
+              1.2s
+            </h3>
+            <p className="text-xs font-bold text-orange-600 mt-2 flex items-center gap-1 uppercase">
+              Compute{" "}
+              <span className="text-slate-400 font-medium lowercase">
+                duration
+              </span>
+            </p>
+          </div>
+          <div className="p-3 bg-slate-100 rounded-xl text-slate-700 group-hover:bg-orange-50 group-hover:text-orange-600 transition-all">
+            <Clock className="w-6 h-6" />
+          </div>
+        </div>
+      </div>
+
+      <div className="main-card overflow-hidden flex flex-col max-h-[calc(100vh-340px)]">
+        <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 bg-white/80 backdrop-blur-md z-30">
+          <div className="flex items-center gap-8">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+              <input
+                type="text"
+                placeholder="Registry Query..."
+                className="pl-11 pr-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold font-bold outline-none focus:ring-4 focus:ring-primary-500/5 transition-all text-slate-900 w-64 md:w-80"
+              />
+            </div>
+          </div>
           <button
             onClick={handleGenerate}
             disabled={isGenerating}
-            className="btn-primary py-3 px-6 text-xs tracking-widest uppercase font-bold"
+            className="btn-primary py-3 px-6 text-[10px] tracking-widest uppercase font-bold"
           >
             {isGenerating ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
             ) : (
               <FileText className="w-4 h-4" />
             )}
-            {isGenerating ? "Compiling Output..." : "Generate New Extract"}
+            {isGenerating ? "Compiling..." : "Generate New Extract"}
           </button>
         </div>
-      </div>
-
-      {showFilters && (
-        <div className="main-card p-8 flex flex-wrap gap-10 animate-slide-down">
-          <div className="space-y-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
-              Data Dimension
-            </label>
-            <select className="bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold p-3 outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-500/30 transition-all min-w-[240px]">
-              <option>Global Revenue by Region</option>
-              <option>Carrier Efficiency Matrix</option>
-              <option>Operational Delay Registry</option>
-            </select>
-          </div>
-          <div className="space-y-3">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
-              Temporal Range
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="date"
-                className="bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold p-3 outline-none focus:ring-4 focus:ring-primary-500/5 transition-all"
-              />
-              <span className="text-slate-300 font-bold">TO</span>
-              <input
-                type="date"
-                className="bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold p-3 outline-none focus:ring-4 focus:ring-primary-500/5 transition-all"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="p-8 bg-white border border-slate-200 rounded-[2.5rem] shadow-sm">
-          <p className="text-[10px] font-bold text-primary-600 uppercase tracking-[0.3em] mb-6">
-            Pipeline Health
-          </p>
-          <div className="flex items-end justify-between">
-            <div>
-              <h4 className="text-4xl font-bold text-slate-900 mb-2 tracking-tighter">
-                99.8%
-              </h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                Accuracy Threshold
-              </p>
-            </div>
-            <div className="p-4 bg-primary-50 rounded-[1.5rem] border border-primary-100">
-              <CheckCircle2 className="w-8 h-8 text-primary-600" />
-            </div>
-          </div>
-        </div>
-        <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-6">
-            Total Extracts
-          </p>
-          <div className="flex items-end justify-between">
-            <div>
-              <h4 className="text-4xl font-bold text-slate-900 mb-2 tracking-tighter">
-                1,240
-              </h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                Fiscal Cycle 2026
-              </p>
-            </div>
-            <div className="p-4 bg-blue-50 rounded-[1.5rem] border border-blue-100">
-              <ArrowUpRight className="w-8 h-8 text-blue-600" />
-            </div>
-          </div>
-        </div>
-        <div className="p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-6">
-            Processing KPI
-          </p>
-          <div className="flex items-end justify-between">
-            <div>
-              <h4 className="text-4xl font-bold text-slate-900 mb-2 tracking-tighter">
-                1.2s
-              </h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                Compute Duration
-              </p>
-            </div>
-            <div className="p-4 bg-orange-50 rounded-[1.5rem] border border-orange-100">
-              <Clock className="w-8 h-8 text-orange-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="main-card overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.2em]">
-              Generated Artifacts
-            </h3>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-              Audit Trail Archive
-            </p>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-            <input
-              type="text"
-              placeholder="Registry Query..."
-              className="pl-11 pr-5 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold outline-none focus:ring-4 focus:ring-primary-500/5 transition-all text-slate-900 w-64"
-            />
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <table className="w-full text-left border-separate border-spacing-0">
+            <thead className="sticky top-0 z-20">
               <tr className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
-                <th className="px-8 py-5">Identity Pointer</th>
-                <th className="px-8 py-5">Sync Timestamp</th>
-                <th className="px-8 py-5">Protocol</th>
-                <th className="px-8 py-5 text-right">Download</th>
+                <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+                  Identity Pointer
+                </th>
+                <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+                  Sync Timestamp
+                </th>
+                <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10">
+                  Protocol
+                </th>
+                <th className="px-8 py-5 border-b border-slate-100 bg-white sticky top-0 z-10 text-right">
+                  Download
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -231,7 +192,10 @@ export const ReportsView: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <button className="p-3 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all shadow-sm active:scale-95">
+                    <button
+                      onClick={() => handleDownload(report.name)}
+                      className="p-3 bg-white border border-slate-200 text-slate-400 rounded-2xl hover:bg-primary-600 hover:text-white hover:border-primary-600 transition-all shadow-sm active:scale-95"
+                    >
                       <Download className="w-5 h-5" />
                     </button>
                   </td>

@@ -82,8 +82,8 @@ export const AnalyticsCharts: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 main-card p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 main-card p-6">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-primary-50 rounded-xl text-primary-600">
@@ -146,7 +146,7 @@ export const AnalyticsCharts: React.FC = () => {
           </div>
         </div>
 
-        <div className="main-card p-8">
+        <div className="main-card p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600">
               <Activity className="w-5 h-5" />
@@ -203,8 +203,8 @@ export const AnalyticsCharts: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="main-card p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="main-card p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
               <Package className="w-5 h-5" />
@@ -239,7 +239,7 @@ export const AnalyticsCharts: React.FC = () => {
           </div>
         </div>
 
-        <div className="main-card p-8">
+        <div className="main-card p-6">
           <div className="flex items-center gap-3 mb-8">
             <div className="p-2.5 bg-orange-50 rounded-xl text-orange-600">
               <Users className="w-5 h-5" />

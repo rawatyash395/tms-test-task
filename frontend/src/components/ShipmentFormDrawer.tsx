@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -12,6 +12,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Shipment } from "../types";
+import { CustomSelect } from "./CustomSelect";
 
 const INITIAL_FORM_STATE = {
   shipper_name: "",
@@ -32,6 +33,28 @@ const INITIAL_FORM_STATE = {
   priority: "normal",
   notes: "",
 };
+
+const STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "in_transit", label: "In Transit" },
+  { value: "delivered", label: "Delivered" },
+  { value: "delayed", label: "Delayed" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const PRIORITY_OPTIONS = [
+  { value: "low", label: "Standard (Low)" },
+  { value: "normal", label: "Normal" },
+  { value: "high", label: "Priority (High)" },
+  { value: "urgent", label: "Critical (Urgent)" },
+];
+
+const CURRENCY_OPTIONS = [
+  { value: "USD", label: "USD - US Dollar" },
+  { value: "EUR", label: "EUR - Euro" },
+  { value: "GBP", label: "GBP - British Pound" },
+  { value: "INR", label: "INR - Indian Rupee" },
+];
 
 interface ShipmentFormDrawerProps {
   isOpen: boolean;
@@ -93,18 +116,28 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
     };
   }, [isOpen]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >,
-  ) => {
-    const { name, value, type } = e.target;
+  const handleChange = useCallback(
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >,
+    ) => {
+      const { name, value, type } = e.target;
+      setFormData((prev: any) => ({
+        ...prev,
+        [name]:
+          type === "number" ? (value === "" ? "" : parseFloat(value)) : value,
+      }));
+    },
+    [],
+  );
+
+  const handleCustomChange = useCallback((name: string, value: string) => {
     setFormData((prev: any) => ({
       ...prev,
-      [name]:
-        type === "number" ? (value === "" ? "" : parseFloat(value)) : value,
+      [name]: value,
     }));
-  };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +172,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-y-0 right-0 w-full max-w-[600px] bg-white z-[200] shadow-2xl flex flex-col"
           >
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-primary-600 text-white rounded-2xl shadow-lg shadow-primary-900/20">
                   <Package className="w-6 h-6" />
@@ -150,7 +183,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </h2>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
                     {shipment
-                      ? `Registry ID: ${shipment.id.substring(0, 8)}`
+                      ? `Registry ID: ${shipment.tracking_number || shipment.id}`
                       : "Enterprise Asset Registration"}
                   </p>
                 </div>
@@ -166,7 +199,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
             <form
               id="shipment-form"
               onSubmit={handleSubmit}
-              className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar"
+              className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
             >
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
@@ -176,7 +209,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">
                       Shipper Name *
@@ -205,7 +238,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">
                       Shipper Email
@@ -242,7 +275,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase ml-1 flex items-center gap-2">
                       <MapPin className="w-3.5 h-3.5 text-primary-500" /> Origin
@@ -273,7 +306,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase ml-1 flex items-center gap-2">
                       <Calendar className="w-3.5 h-3.5 text-slate-400" /> Pickup
@@ -312,7 +345,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase ml-1 flex items-center gap-2">
                       <Scale className="w-3.5 h-3.5 text-slate-400" /> Net
@@ -343,7 +376,7 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="col-span-2 space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase ml-1 flex items-center gap-2">
                       <DollarSign className="w-3.5 h-3.5 text-primary-500" />{" "}
@@ -360,22 +393,12 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                       placeholder="0.00"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">
-                      Currency
-                    </label>
-                    <select
-                      name="currency"
-                      value={formData.currency}
-                      onChange={handleChange}
-                      className="input w-full appearance-none"
-                    >
-                      <option value="USD">USD</option>
-                      <option value="EUR">EUR</option>
-                      <option value="GBP">GBP</option>
-                      <option value="INR">INR</option>
-                    </select>
-                  </div>
+                  <CustomSelect
+                    label="Currency"
+                    value={formData.currency}
+                    onChange={(val) => handleCustomChange("currency", val)}
+                    options={CURRENCY_OPTIONS}
+                  />
                 </div>
               </div>
 
@@ -387,40 +410,19 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">
-                      Current State
-                    </label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      className="input w-full appearance-none"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="in_transit">In Transit</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="delayed">Delayed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">
-                      Priority Index
-                    </label>
-                    <select
-                      name="priority"
-                      value={formData.priority}
-                      onChange={handleChange}
-                      className="input w-full appearance-none"
-                    >
-                      <option value="low">Standard (Low)</option>
-                      <option value="normal">Normal</option>
-                      <option value="high">Priority (High)</option>
-                      <option value="urgent">Critical (Urgent)</option>
-                    </select>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <CustomSelect
+                    label="Current State"
+                    value={formData.status}
+                    onChange={(val) => handleCustomChange("status", val)}
+                    options={STATUS_OPTIONS}
+                  />
+                  <CustomSelect
+                    label="Priority Index"
+                    value={formData.priority}
+                    onChange={(val) => handleCustomChange("priority", val)}
+                    options={PRIORITY_OPTIONS}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -456,21 +458,21 @@ export const ShipmentFormDrawer: React.FC<ShipmentFormDrawerProps> = ({
               )}
             </form>
 
-            <div className="p-8 border-t border-slate-100 bg-slate-50/50 flex gap-4 mt-auto">
+            <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex gap-4 mt-auto">
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-secondary flex-1"
+                className="btn-secondary flex-1 max-h-[42px] p-2"
               >
                 Cancel
               </button>
               <button
                 form="shipment-form"
                 type="submit"
-                className="btn-primary flex-[2]"
+                className="btn-primary flex-[2] max-h-[42px] p-2"
               >
                 <Save className="w-5 h-5" />
-                {shipment ? "Synchronize Record" : "Register Shipment"}
+                {shipment ? "Update Shipment" : "Register Shipment"}
               </button>
             </div>
           </motion.div>
