@@ -68,7 +68,7 @@ export const CarrierView: React.FC<CarrierViewProps> = ({ onAdd, isAdmin }) => {
               className="btn-primary py-3 px-6 text-[10px] tracking-widest uppercase font-bold"
             >
               <Plus className="w-4 h-4" />
-              Register Partner
+              Add Carrier
             </button>
           )}
         </div>

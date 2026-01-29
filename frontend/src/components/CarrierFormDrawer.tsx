@@ -199,7 +199,7 @@ export const CarrierFormDrawer: React.FC<CarrierFormDrawerProps> = ({
                 className="btn-primary flex-[2] max-h-[42px] p-2"
               >
                 <Save className="w-5 h-5" />
-                Register Partner
+                Add Carrier
               </button>
             </div>
           </motion.div>
